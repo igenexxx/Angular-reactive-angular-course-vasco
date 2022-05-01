@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {Course, sortCoursesBySeqNo} from '../model/course';
-import {interval, noop, Observable, of, throwError, timer} from 'rxjs';
-import {catchError, delay, delayWhen, filter, finalize, map, retryWhen, shareReplay, tap} from 'rxjs/operators';
+import {identity, interval, noop, Observable, of, pipe, throwError, timer, UnaryFunction} from 'rxjs';
+import {catchError, delay, delayWhen, filter, finalize, map, retryWhen, shareReplay, switchMap, tap, toArray} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {CourseDialogComponent} from '../course-dialog/course-dialog.component';
+import {CoursesService} from '../services/courses.service';
 
 
 @Component({
@@ -14,29 +15,23 @@ import {CourseDialogComponent} from '../course-dialog/course-dialog.component';
 })
 export class HomeComponent implements OnInit {
 
-  beginnerCourses: Course[];
+  beginnerCourses$: Observable<Course[]>;
 
-  advancedCourses: Course[];
+  advancedCourses$: Observable<Course[]>;
 
 
-  constructor(private http: HttpClient, private dialog: MatDialog) {
+  constructor(private dialog: MatDialog, private coursesService: CoursesService) {
 
   }
 
   ngOnInit() {
+    const courses$ = this.coursesService.loadAllCourses().pipe(map(courses => courses.sort(sortCoursesBySeqNo)));
+    this.beginnerCourses$ = courses$.pipe(this.getCoursesByCategory('BEGINNER'));
+    this.advancedCourses$ = courses$.pipe(this.getCoursesByCategory('ADVANCED'));
+  }
 
-    this.http.get('/api/courses')
-      .subscribe(
-        res => {
-
-          const courses: Course[] = res["payload"].sort(sortCoursesBySeqNo);
-
-          this.beginnerCourses = courses.filter(course => course.category == "BEGINNER");
-
-          this.advancedCourses = courses.filter(course => course.category == "ADVANCED");
-
-        });
-
+  private getCoursesByCategory(category: 'BEGINNER' | 'ADVANCED'): UnaryFunction<Observable<Course[]>, Observable<Course[]>> {
+    return pipe(switchMap(identity), filter(course => course.category === category), toArray());
   }
 
   editCourse(course: Course) {
