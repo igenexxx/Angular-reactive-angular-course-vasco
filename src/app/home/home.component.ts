@@ -1,10 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Course, sortCoursesBySeqNo} from '../model/course';
-import {identity, interval, noop, Observable, of, pipe, throwError, timer, UnaryFunction} from 'rxjs';
-import {catchError, delay, delayWhen, filter, finalize, map, retryWhen, shareReplay, switchMap, tap, toArray} from 'rxjs/operators';
-import {HttpClient} from '@angular/common/http';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {CourseDialogComponent} from '../course-dialog/course-dialog.component';
+import {identity, Observable, pipe, UnaryFunction} from 'rxjs';
+import {filter, map, switchMap, toArray} from 'rxjs/operators';
 import {CoursesService} from '../services/courses.service';
 
 
@@ -20,7 +17,7 @@ export class HomeComponent implements OnInit {
   advancedCourses$: Observable<Course[]>;
 
 
-  constructor(private dialog: MatDialog, private coursesService: CoursesService) {
+  constructor(private coursesService: CoursesService) {
 
   }
 
@@ -32,20 +29,6 @@ export class HomeComponent implements OnInit {
 
   private getCoursesByCategory(category: 'BEGINNER' | 'ADVANCED'): UnaryFunction<Observable<Course[]>, Observable<Course[]>> {
     return pipe(switchMap(identity), filter(course => course.category === category), toArray());
-  }
-
-  editCourse(course: Course) {
-
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.width = "400px";
-
-    dialogConfig.data = course;
-
-    const dialogRef = this.dialog.open(CourseDialogComponent, dialogConfig);
-
   }
 
 }
