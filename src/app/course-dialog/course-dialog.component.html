@@ -1,14 +1,11 @@
 <h2 mat-dialog-title>{{course.description}}</h2>
 
-
 <mat-dialog-content [formGroup]="form">
 
   <mat-form-field>
-
     <input matInput
            placeholder="Course Description"
            formControlName="description">
-
   </mat-form-field>
 
   <mat-form-field>
@@ -45,12 +42,7 @@
   </mat-form-field>
 
   <mat-form-field>
-
-        <textarea matInput placeholder="Description"
-                  formControlName="longDescription">
-
-        </textarea>
-
+    <textarea matInput placeholder="Description" formControlName="longDescription"></textarea>
   </mat-form-field>
 
 
@@ -58,8 +50,7 @@
 
 <mat-dialog-actions>
 
-  <button class="mat-raised-button"
-          (click)="close()">
+  <button class="mat-raised-button" (click)="close()">
     Close
   </button>
 

@@ -22,15 +22,22 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    const courses$ = this.coursesService.loadAllCourses().pipe(map(courses => courses.sort(sortCoursesBySeqNo)));
-    this.beginnerCourses$ = courses$.pipe(this.getCoursesByCategory('BEGINNER'));
-    this.advancedCourses$ = courses$.pipe(this.getCoursesByCategory('ADVANCED'));
+   this.reloadCourses();
   }
 
   private getCoursesByCategory(category: 'BEGINNER' | 'ADVANCED'): UnaryFunction<Observable<Course[]>, Observable<Course[]>> {
     return pipe(switchMap(identity), filter(course => course.category === category), toArray());
   }
 
+  private reloadCourses() {
+    const courses$ = this.coursesService.loadAllCourses().pipe(map(courses => courses.sort(sortCoursesBySeqNo)));
+    this.beginnerCourses$ = courses$.pipe(this.getCoursesByCategory('BEGINNER'));
+    this.advancedCourses$ = courses$.pipe(this.getCoursesByCategory('ADVANCED'));
+  }
+
+  onCoursesChanges() {
+    this.reloadCourses();
+  }
 }
 
 
